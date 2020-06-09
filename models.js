@@ -41,9 +41,6 @@ const SlotSchema = new Schema({
     meetingType: {
         type: String
     },
-    restrictedUsers:{
-        type: Array
-    },
     destination: {
         type: String
     },
@@ -69,10 +66,6 @@ const FriendsSchema = new Schema({
         type: Number,
         required: true
     },
-    typeFriends: {
-        type: String,
-        required: true
-    },
     firstuser: {
         type: String,
         required: true
@@ -83,7 +76,13 @@ const FriendsSchema = new Schema({
     },
     state: {
         type: Boolean,
-        required: true
+        required: true,
+        default: 0
+    },
+    is_banned: {
+        type: Boolean,
+        required: true,
+        default: 0
     }
 });
 
