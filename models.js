@@ -1,14 +1,14 @@
 const UserSchema = new Schema({
+    id:{
+        type: Number,
+        required:true
+    },
     name:{
       type: String,
       required: true
     },
     surname:{
       type: String,
-      required: true
-    },
-    birthDate: {
-      type: Date,
       required: true
     },
     password: {
@@ -20,22 +20,22 @@ const UserSchema = new Schema({
         required: true
     },
     profilePicture: {
-        type: File
+        type: Blob
     }
   });
 
 
-const FreeSlotSchema = new Schema({
-    user: {
-        type: String,
+const SlotSchema = new Schema({
+    id: {
+        type: Number,
         required: true
     },
-    date: {
-        type: String,
+    start_date: {
+        type: Date,
         required: true
     },
     length: {
-        type: String,
+        type: TimeRanges,
         required: true
     },
     meetingType: {
@@ -43,39 +43,32 @@ const FreeSlotSchema = new Schema({
     },
     restrictedUsers:{
         type: Array
-    }
-});
-
-
-const BookedMeetingSchema = new Schema({
-    firstuser: {
-        type: String,
-        required: true
     },
-    seconduser: {
-        type: String,
-        required: true
-    },
-    date: {
-        type: String,
-        required: true
-    },
-    length: {
-        type: String,
-        required: true
-    },
-    meetingType: {
+    destination: {
         type: String
     },
-    location: {
-        type: String
+    booked:{
+        type: Boolean,
+        required: true,
+        default: 0
     },
-    summary: {
-        type: String
+    user1: {
+        type: string,
+        required: true
+    },
+    user2: {
+        type: string
+    },
+    notes:{
+        type:string
     }
 });
 
 const FriendsSchema = new Schema({
+    id: {
+        type: Number,
+        required: true
+    },
     typeFriends: {
         type: String,
         required: true
@@ -85,6 +78,21 @@ const FriendsSchema = new Schema({
         required: true
     },
     seconduser: {
+        type: String,
+        required: true
+    },
+    state: {
+        type: Boolean,
+        required: true
+    }
+});
+
+const CategoriesSchema = new Schema({
+    id: {
+        type: Number,
+        required: true
+    },
+    categoryName: {
         type: String,
         required: true
     }
