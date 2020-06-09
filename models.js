@@ -50,14 +50,14 @@ const SlotSchema = new Schema({
         default: 0
     },
     user1: {
-        type: string,
+        type: String,
         required: true
     },
     user2: {
-        type: string
+        type: String
     },
     notes:{
-        type:string
+        type:String
     }
 });
 
@@ -79,7 +79,7 @@ const FriendsSchema = new Schema({
         required: true,
         default: 0
     },
-    is_banned: {
+    isBanned: {
         type: Boolean,
         required: true,
         default: 0
