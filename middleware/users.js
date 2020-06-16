@@ -7,12 +7,12 @@ module.exports = {
       }
       if (!req.body.Surname) {
         return res.status(400).send({
-          msg: 'Please enter your first name.'
+          msg: 'Please enter your last name.'
         });
       }
       if (!req.body.EmailAddress) {
         return res.status(400).send({
-          msg: 'Please enter your first name.'
+          msg: 'Please enter your email address.'
         });
       }
       // password min 6 chars

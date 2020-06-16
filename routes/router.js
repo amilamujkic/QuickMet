@@ -9,7 +9,7 @@ const userMiddleware = require('../middleware/users.js');
 
 router.post('/sign-up', userMiddleware.validateRegister, (req, res, next) => {
   db.query(
-    `SELECT * FROM users WHERE LOWER(EmailAddress) = LOWER(${db.escape(
+    `SELECT * FROM User WHERE LOWER(EmailAddress) = LOWER(${db.escape(
       req.body.EmailAddress
     )});`,
     (err, result) => {
@@ -25,7 +25,7 @@ router.post('/sign-up', userMiddleware.validateRegister, (req, res, next) => {
             });
           } else {
             db.query(
-              `INSERT INTO users (id, FirstName, Surname, EmailAddress, Password) VALUES ('${uuid.v4()}', ${db.escape(
+              `INSERT INTO User (UserID, FirstName, Surname, EmailAddress, Password) VALUES ('${uuid.v4()}', ${db.escape(
                 req.body.EmailAddress
               )}, ${db.escape(hash)}, now())`,
               (err, result) => {
@@ -36,7 +36,7 @@ router.post('/sign-up', userMiddleware.validateRegister, (req, res, next) => {
                   });
                 }
                 return res.status(201).send({
-                  msg: 'Registered!'
+                  msg: 'User registered'
                 });
               }
             );
@@ -49,7 +49,7 @@ router.post('/sign-up', userMiddleware.validateRegister, (req, res, next) => {
 
 router.post('/login', (req, res, next) => {
   db.query(
-    `SELECT * FROM users WHERE EmailAddress = ${db.escape(req.body.EmailAddress)};`,
+    `SELECT * FROM User WHERE EmailAddress = ${db.escape(req.body.EmailAddress)};`,
     (err, result) => {
       if (err) {
         throw err;

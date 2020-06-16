@@ -1,6 +1,8 @@
 CREATE DATABASE quickmetdb;
 
-CREATE TABLE Users (
+
+
+CREATE TABLE Users (   -- Actually called User in XAMPP
     UserID int IDENTITY(1,1) NOT NULL PRIMARY KEY,
     FirstName varchar(255) NOT NULL,
     Surname varchar(255) NOT NULL,
