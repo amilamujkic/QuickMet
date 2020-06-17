@@ -11,6 +11,16 @@ CREATE TABLE Users (   -- Actually called User in XAMPP
     ProfilePicture longblob
 );
 
+CREATE TABLE ResetTokens (
+  id int(11) IDENTITY(1,1) NOT NULL PRIMARY KEY,
+  email varchar(255) DEFAULT NULL,
+  token varchar(255) DEFAULT NULL,
+  expiration datetime DEFAULT NULL,
+  createdAt datetime NOT NULL,
+  updatedAt datetime NOT NULL,
+  used int(11) NOT NULL DEFAULT '0',
+) 
+
 CREATE TABLE Friendship (
     FriendshipID int IDENTITY(1,1) NOT NULL,
     FirstUserID int NOT NULL FOREIGN KEY REFERENCES Users(UserID),

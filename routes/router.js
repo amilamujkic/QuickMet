@@ -5,7 +5,17 @@ const uuid = require('uuid');
 const jwt = require('jsonwebtoken');
 const db = require('../lib/db.js');
 const userMiddleware = require('../middleware/users.js');
+const nodemailer = require('nodemailer');
 
+const transport = nodemailer.createTransport({
+  host: "smtp.ethereal.email",
+  port: 587,
+  secure: false,
+  auth: {
+     user: process.env.user,
+     pass: process.env.pass
+  }
+});
 
 router.post('/sign-up', userMiddleware.validateRegister, (req, res, next) => {
   db.query(
@@ -25,7 +35,7 @@ router.post('/sign-up', userMiddleware.validateRegister, (req, res, next) => {
             });
           } else {
             db.query(
-              `INSERT INTO User (UserID, FirstName, Surname, EmailAddress, Password) VALUES ('${uuid.v4()}', ${db.escape(
+              `INSERT INTO User (FirstName, Surname, EmailAddress, Password) VALUES ('${uuid.v4()}', ${db.escape(
                 req.body.EmailAddress
               )}, ${db.escape(hash)}, now())`,
               (err, result) => {
@@ -96,9 +106,79 @@ router.post('/login', (req, res, next) => {
   );
 });
 
-router.get('/secret-route', userMiddleware.isLoggedIn, (req, res, next) => {
-  console.log(req.userData);
-  res.send('This is the secret content. Only logged in users can see that!');
+
+router.get('/forgot-password', function(req, res, next) {
+  res.render('user/forgot-password', { });
 });
+
+
+router.post('/forgot-password', async function(req, res, next) {
+  var email = await User.findOne({where: { email: req.body.email }});
+  if (email == null) {
+    return res.json({status: 'ok'});
+  }
+  await ResetToken.update({
+      used: 1
+    },
+    {
+      where: {
+        email: req.body.email
+      }
+  });
+ 
+  var fpSalt = crypto.randomBytes(64).toString('base64');
+  var expireDate = new Date();
+
+  expireDate.setDate(expireDate.getDate() + 1/24);
+   await ResetToken.create({
+    email: req.body.email,
+    expiration: expireDate,
+    token: token,
+    used: 0
+  });
+ 
+  const message = {
+      from: process.env.SENDER_ADDRESS,
+      to: req.body.email,
+      replyTo: process.env.REPLYTO_ADDRESS,
+      subject: process.env.FORGOT_PASS_SUBJECT_LINE,
+      text: 'To reset your password, please click the link below.\n\nhttps://'+process.env.DOMAIN+'/user/reset-password?token='+encodeURIComponent(token)+'&email='+req.body.email
+  };
+ 
+  transport.sendMail(message, function (err, info) {
+     if(err) { console.log(err)}
+     else { console.log(info); }
+  });
+  return res.json({status: 'ok'});
+});
+
+
+router.post('/index', userMiddleware.isLoggedIn, (req, res, next) => {
+  message = '';
+  if (!req.files)
+      return res.status(400).send('No files were uploaded.');
+
+  var file = req.files.uploaded_image;
+  var img_name=file.name;
+
+     if(file.mimetype == "image/jpeg" ||file.mimetype == "image/png"||file.mimetype == "image/gif" ){
+                               
+            file.mv('public/images/upload_images/'+file.name, function(err) {
+                           
+              if (err)
+
+                return res.status(500).send(err);
+              var sql = "INSERT INTO `Users`('ProfilePicture') VALUES (img_name)";
+              var query = db.query(sql, function(err, result) {
+                 res.redirect('profile/'+result.insertId);
+              });
+           });
+        } else {
+          message = "This format is not allowed , please upload file with '.png','.gif','.jpg'";
+        }
+});
+
+
+
 
 module.exports = router;
