@@ -168,7 +168,7 @@ router.post('/user/profilepicture', userMiddleware.isLoggedIn, (req, res, next) 
               if (err)
 
                 return res.status(500).send(err);
-              var sql = "INSERT INTO `Users`('ProfilePicture') VALUES (img_name)";
+              var sql = "INSERT INTO `User`('ProfilePicture') VALUES (img_name)";
               var query = db.query(sql, function(err, result) {
                  res.redirect('profile/'+result.insertId);
               });
@@ -179,6 +179,12 @@ router.post('/user/profilepicture', userMiddleware.isLoggedIn, (req, res, next) 
 });
 
 
-
+router.get('/user/friends', async (req, res) => {
+  var user = 1;
+  var conn = await connection(db).catch(e => {});
+  var friends = await query(conn, `SELECT User.FirstName, User.Surname FROM Friendship, User
+  WHERE Friendship.SecondUserID = User.UserID and Friendship.FirstUserID = ?`, [user])
+  return res.status(200).send(friends);
+});
 
 module.exports = router;

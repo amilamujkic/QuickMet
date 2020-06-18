@@ -6,6 +6,7 @@ const app = require('../app');
 const http = require('chai-http');
 chai.use(http);
 
+let should = chai.should();
 
 describe('App basic tests', () => {
   it('Should exists', () => {
@@ -90,7 +91,17 @@ describe('POST /user/profilepicture - upload a new image file', () => {
   });
 });
 
+describe('/user/friends', ()=>{
+  it('should return all friends of the user', (done) =>{
+      chai.request(app)
+      .get('/user/friends')
+      .end(function(err, res){
+          expect(res).to.have.status(200);
+          done();
+      });	
+  });
 
+});
 
 
 
