@@ -153,7 +153,7 @@ router.post('/forgot-password', async function(req, res, next) {
 });
 
 
-router.post('/index', userMiddleware.isLoggedIn, (req, res, next) => {
+router.post('/user/profilepicture', userMiddleware.isLoggedIn, (req, res, next) => {
   message = '';
   if (!req.files)
       return res.status(400).send('No files were uploaded.');
@@ -163,7 +163,7 @@ router.post('/index', userMiddleware.isLoggedIn, (req, res, next) => {
 
      if(file.mimetype == "image/jpeg" ||file.mimetype == "image/png"||file.mimetype == "image/gif" ){
                                
-            file.mv('public/images/upload_images/'+file.name, function(err) {
+            file.mv('/user/profilepicture'+file.name, function(err) {
                            
               if (err)
 

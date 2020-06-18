@@ -1,8 +1,8 @@
 const chai = require('chai');
 const expect = chai.expect;
-
+const request = require('supertest');
+const fs = require('mz/fs');
 const app = require('../app');
-
 const http = require('chai-http');
 chai.use(http);
 
@@ -65,6 +65,32 @@ describe('User login', () => {
         })
   });
 });
+
+let testFilePath = null;
+
+describe('POST /user/profilepicture - upload a new image file', () => {
+  const filePath = `${__dirname}/testFiles/test.img`;
+
+  it('should upload the test file to CDN', () => {
+    fs.exists(filePath)
+      .then((exists) => {
+        if (!exists) throw new Error('No files were uploaded.'); 
+        return request(app)
+          .post('/user/profilepicture')
+          .attach('file', filePath)
+          .then((res) => {
+            const { success, message, filePath } = res.body;
+            expect(success).toBeTruthy();
+            expect(message).toBe('Uploaded successfully');
+            expect(typeof filePath).toBeTruthy();
+            testFilePath = filePath;
+          })
+          .catch(err => console.log(err));
+      })
+  });
+});
+
+
 
 
 
