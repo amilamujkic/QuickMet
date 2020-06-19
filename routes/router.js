@@ -218,7 +218,14 @@ router.post('/slots/add', function(req, res) {
     req.body.SurnameBan
   )})) `;
 
-  connection.query(stmt, stmu, stmv, stmz, (err, results) => {
+  let stmy = `UPDATE Friendship (isBanned) SET isBanned = false WHERE Friendship.SecondUserID = User.UserID 
+  and Friendship.FirstUserID = ? and LOWER(User.FirstName) = LOWER((${db.escape(
+    req.body.FirstNameBan
+  )})) and LOWER(User.FirstName) = LOWER((${db.escape(
+    req.body.SurnameBan
+  )})) `;
+
+  connection.query(stmt, stmu, stmv, stmz, stmy, (err, results) => {
   if (err) {
    return res.status(500).send('Something is missing. Check it out.');
   }
@@ -244,6 +251,19 @@ router.get('/slots', async (req, res) => {
 
 });
 
+// deleting slots of the user
 
+router.post('/slots/delete', function(req, res) {
+
+  let deletion = `DELETE * FROM Slot WHERE SlotID = (${db.escape(req.body.SlotID)}) and isBooked = false`;
+
+  connection.query(deletion, (err, results) => {
+  if (err) {
+   return res.status(500).send('Could not delete it. Error!');
+  }
+    return res.status(200);
+  });
+
+});
 
 module.exports = router;
