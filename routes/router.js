@@ -17,6 +17,8 @@ const transport = nodemailer.createTransport({
   }
 });
 
+//sign-up route
+
 router.post('/sign-up', userMiddleware.validateRegister, (req, res, next) => {
   db.query(
     `SELECT * FROM User WHERE LOWER(EmailAddress) = LOWER(${db.escape(
@@ -56,6 +58,9 @@ router.post('/sign-up', userMiddleware.validateRegister, (req, res, next) => {
     }
   );
 });
+
+
+//login route
 
 router.post('/login', (req, res, next) => {
   db.query(
@@ -106,6 +111,7 @@ router.post('/login', (req, res, next) => {
   );
 });
 
+//forgot password routes
 
 router.get('/forgot-password', function(req, res, next) {
   res.render('user/forgot-password', { });
@@ -153,6 +159,8 @@ router.post('/forgot-password', async function(req, res, next) {
 });
 
 
+//profile picture route
+
 router.post('/user/profilepicture', userMiddleware.isLoggedIn, (req, res, next) => {
   message = '';
   if (!req.files)
@@ -179,6 +187,8 @@ router.post('/user/profilepicture', userMiddleware.isLoggedIn, (req, res, next) 
 });
 
 
+// fetching friends route
+
 router.get('/user/friends', async (req, res) => {
   var user = 1;
   var conn = await connection(db).catch(e => {});
@@ -186,5 +196,54 @@ router.get('/user/friends', async (req, res) => {
   WHERE Friendship.SecondUserID = User.UserID and Friendship.FirstUserID = ?`, [user])
   return res.status(200).send(friends);
 });
+
+// adding slots route
+
+
+router.post('/slots/add', function(req, res) {
+
+  let stmt = `INSERT INTO Slot (StartDate, Duration, Destination, Notes)  VALUES ((${db.escape(
+    req.body.StartDate, req.body.Duration, req.body.Destination, req.body.Notes)}))`;
+
+  let stmu = `INSERT INTO Slot (MeetingTypeID) SELECT CategoryID FROM Categories WHERE LOWER(Categories.CategoryName) = LOWER((${db.escape(
+    req.body.CategoryName
+  )}))`;
+
+  let stmv = `INSERT INTO Slot (FirstUserID) SELECT UserID FROM User WHERE User.UserID = ?`;
+
+  let stmz = `UPDATE Friendship (isBanned) SET isBanned = true WHERE Friendship.SecondUserID = User.UserID 
+  and Friendship.FirstUserID = ? and LOWER(User.FirstName) = LOWER((${db.escape(
+    req.body.FirstNameBan
+  )})) and LOWER(User.FirstName) = LOWER((${db.escape(
+    req.body.SurnameBan
+  )})) `;
+
+  connection.query(stmt, stmu, stmv, stmz, (err, results) => {
+  if (err) {
+   return res.status(500).send('Something is missing. Check it out.');
+  }
+    return res.status(200);
+  });
+
+});
+
+// listing slots of the user
+
+router.get('/slots', async (req, res) => {
+
+  var user = 1;
+  var conn = await connection(db).catch(e => {});
+  var slots = await query(conn, 
+    `SELECT Slot.StartDate, Slot.Duration, Categories.CategoryName, Slot.Destination,  Slot.isBooked, Slot.Notes
+     FROM Slot, Categories
+     WHERE Categories.CategoryID = Slot.MeetingTypeID 
+      and (Slot.FirstUserID = ? or Slot.SecondUserID = ?) 
+      and (Slot.StartDate + Slot.Duration > CURRENT_TIMESTAMP)
+     ORDERBY Slot.StartDate`, [user])
+  return res.status(200).send(slots);
+
+});
+
+
 
 module.exports = router;
