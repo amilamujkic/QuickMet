@@ -225,7 +225,7 @@ router.post('/slots/add', function(req, res) {
     req.body.SurnameBan
   )})) `;
 
-  connection.query(stmt, stmu, stmv, stmz, stmy, (err, results) => {
+  connection(db).query(stmt, stmu, stmv, stmz, stmy, (err, results) => {
   if (err) {
    return res.status(500).send('Something is missing. Check it out.');
   }
@@ -257,7 +257,7 @@ router.post('/slots/delete', function(req, res) {
 
   let deletion = `DELETE * FROM Slot WHERE SlotID = (${db.escape(req.body.SlotID)}) and isBooked = false`;
 
-  connection.query(deletion, (err, results) => {
+  connection(db).query(deletion, (err, results) => {
   if (err) {
    return res.status(500).send('Could not delete it. Error!');
   }

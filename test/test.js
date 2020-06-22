@@ -148,6 +148,30 @@ describe('getting slots of the user', ()=>{
   });
 });	
 
+describe('Deleting slots', () => {
+  it('/should return 200 for successfully deleted slot', (done) => {
+    let user_input = {
+      "SlotID": "3"
+      }
+    chai.request(app).post('/slots/delete').send(user_input).then(res => {
+      expect(res).to.have.status(200);
+      done();
+    }).catch(err => {
+      console.log(err);
+    });
+  })
+
+  it('/should return 500 for error', (done) => {
+    chai.request(app).post('/slots/delete').then(res => {
+      expect(res).to.have.status(500);
+      expect(res.body).to.be.equal('Could not delete it. Error!');
+      done();
+    }).catch(err => {
+      console.log(err);
+    });
+  });
+});
+
 
 
 
