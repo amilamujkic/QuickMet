@@ -103,5 +103,41 @@ describe('/user/friends', ()=>{
 
 });
 
+describe('Adding slots', () => {
+  it('/should return 200 for successfully added slot', (done) => {
+    let user_input = {
+      "StartDate":"2012-04-23T18:25:43.511Z",
+      "Duration":"2:30:00",
+      "Destination":"Ahar",
+      "Notes":"Meet in front of the office",
+      "CategoryName":"Lunch"
+      }
+    chai.request(app).post('/slots/add').send(user_input).then(res => {
+      expect(res).to.have.status(200);
+      done();
+    }).catch(err => {
+      console.log(err);
+    });
+  })
+
+  it('/should return 500 for missing information', (done) => {
+    let user_invalid_input = {
+      "Duration":"2:30:00",
+      "Destination":"Ahar",
+      "Notes":"Meet in front of the office",
+      "CategoryName":"Lunch"
+    }
+    chai.request(app).post('/slots/add').send(user_invalid_input).then(res => {
+      expect(res).to.have.status(500);
+      expect(res.body).to.be.equal('Something is missing. Check it out.');
+      done();
+    }).catch(err => {
+      console.log(err);
+    });
+  })
+})
+
+
+
 
 
