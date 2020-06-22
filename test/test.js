@@ -134,8 +134,20 @@ describe('Adding slots', () => {
     }).catch(err => {
       console.log(err);
     });
-  })
-})
+  });
+});
+
+describe('getting slots of the user', ()=>{
+  it('should return all friends of the user', (done) =>{
+      chai.request(app)
+      .get('/slots')
+      .end(function(err, res){
+          expect(res).to.have.status(200);
+          done();
+      });	
+  });
+});	
+
 
 
 
