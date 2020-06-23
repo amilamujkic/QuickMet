@@ -266,4 +266,22 @@ router.post('/slots/delete', function(req, res) {
 
 });
 
+// searching for user
+
+router.post('/search', userMiddleware.isLoggedIn, function(req, res) {
+
+  var found = db.query(`SELECT User.FirstName, User.Surname FROM User
+  WHERE LOWER(User.FirstName) = LOWER(${db.escape(
+    req.body.friendname
+  )}) and LOWER(User.Surname) = LOWER(${db.escape(
+    req.body.friendsurname
+  )})`);
+
+  if(err) {
+    return res.status(400);
+  }
+  else { return res.status(200).send(found); }
+  });
+
+  
 module.exports = router;
