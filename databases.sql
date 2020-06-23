@@ -26,7 +26,8 @@ CREATE TABLE Friendship (
     FirstUserID int NOT NULL FOREIGN KEY REFERENCES Users(UserID),
     SecondUserID int NOT NULL FOREIGN KEY REFERENCES Users(UserID),
     isFriend boolean DEFAULT false,
-    isBanned boolean DEFAULT false
+    isBanned boolean DEFAULT false,
+    isRequested boolean DEFAULT false
 );
 
 CREATE TABLE Slot (

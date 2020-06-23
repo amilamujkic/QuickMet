@@ -193,7 +193,7 @@ router.get('/user/friends', async (req, res) => {
   var user = 1;
   var conn = await connection(db).catch(e => {});
   var friends = await query(conn, `SELECT User.FirstName, User.Surname FROM Friendship, User
-  WHERE Friendship.SecondUserID = User.UserID and Friendship.FirstUserID = ?`, [user])
+  WHERE Friendship.SecondUserID = User.UserID and Friendship.FirstUserID = ? and isRequested = false`, [user])
   return res.status(200).send(friends);
 });
 
@@ -283,5 +283,110 @@ router.post('/search', userMiddleware.isLoggedIn, function(req, res) {
   else { return res.status(200).send(found); }
   });
 
+// friend request
+
+router.post('/user/add', userMiddleware.isLoggedIn, function(req, res) {
+
+  db.query(`INSERT INTO Friendship (FirstUserID, SecondUserID, isRequested) 
+  VALUES ?, User.SecondUserID WHERE User.FirstName = ${db.escape(
+    req.body.FirstName
+  )}) and User.Surname = ${db.escape(
+    req.body.Surname
+  )}), true`);
+
+  if(err) {
+    return res.status(400);
+  }
+  else { 
+    var msg = "User added!"
+    return res.status(200).send(msg); }
+  });
+
+// delete friend
+
+router.post('/user/delete', userMiddleware.isLoggedIn, function(req, res) {
+
+  db.query(`DELETE FROM Friendship WHERE (Friendship.FirstUserID = User.UserID and User.FirstName = ${db.escape(
+    req.body.FUFirstName
+  )}) and User.Surname = ${db.escape(
+    req.body.FUSurname
+  )})) and (Friendship.SecondUserID = User.UserID and User.FirstName = ${db.escape(
+    req.body.SUFirstName
+  )}) and User.Surname = ${db.escape(
+    req.body.SUSurname
+  )}))`);
+
+  if(err) {
+    return res.status(400);
+  }
+  else { 
+    var msg = "User deleted from friends!"
+    return res.status(200).send(msg); }
+  });
   
+// accept/decline friend request
+
+router.post('/user/request', userMiddleware.isLoggedIn, function(req, res) {
+
+  var action = req.body.action; 
+
+  if(action === "accept") {
+  db.query(`UPDATE Friendship SET isFriend = true  and isRequested = false WHERE Friendship.FirstUserID = User.UserID and User.FirstName = ${db.escape(
+    req.body.FUFirstName
+  )}) and User.Surname = ${db.escape(
+    req.body.FUSurname
+  )})) and (Friendship.SecondUserID = User.UserID and User.FirstName = ${db.escape(
+    req.body.SUFirstName
+  )}) and User.Surname = ${db.escape(
+    req.body.SUSurname
+  )}))`);
+  }
+  else {
+    if(action === "accept") {
+      db.query(`UPDATE Friendship SET isFriend = false  and isRequested = false WHERE Friendship.FirstUserID = User.UserID and User.FirstName = ${db.escape(
+        req.body.FUFirstName
+      )}) and User.Surname = ${db.escape(
+        req.body.FUSurname
+      )})) and (Friendship.SecondUserID = User.UserID and User.FirstName = ${db.escape(
+        req.body.SUFirstName
+      )}) and User.Surname = ${db.escape(
+        req.body.SUSurname
+      )}))`);
+      }
+  }
+
+  if(err) {
+    return res.status(400);
+  }
+  else { 
+    var msg = "Action done!"
+    return res.status(200).send(msg); }
+  });
+
+
+// mutual meetings
+
+router.post('/friends/slots', userMiddleware.isLoggedIn, function(req, res) {
+  
+    var slotslist = db.query(`SELECT Slot.StartDate, Slot.Duration, Categories.CategoryName, Slot.Destination, Slot.Notes
+    FROM Slot, Categories
+    WHERE Categories.CategoryID = Slot.MeetingTypeID 
+     and (Slot.FirstUserID = User.UserID and User.FirstName = ${db.escape(
+      req.body.FUFirstName
+    )}) and User.Surname = ${db.escape(
+      req.body.FUSurname
+    )})) and (Friendship.SecondUserID = User.UserID and User.FirstName = ${db.escape(
+      req.body.SUFirstName
+    )}) and User.Surname = ${db.escape(
+      req.body.SUSurname
+    )}))
+    ORDERBY Slot.StartDate`);
+  
+    if(err) {
+      return res.status(400);
+    }
+    else { 
+      return res.status(200).send(slotslist); };
+    });
+
 module.exports = router;
