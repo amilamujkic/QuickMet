@@ -50,7 +50,7 @@ describe('User registration', () => {
 
 describe('User login', () => {
   it('should return 200 and token for valid credentials', (done) => {
-    const valid_input = {
+    var valid_input = {
       "email": "amilamjk@gmail.com",
       "password": "secret"
     }
@@ -70,7 +70,7 @@ describe('User login', () => {
 let testFilePath = null;
 
 describe('POST /user/profilepicture - upload a new image file', () => {
-  const filePath = `${__dirname}/testFiles/test.img`;
+  var filePath = `${__dirname}/testFiles/test.img`;
 
   it('should upload the test file to CDN', () => {
     fs.exists(filePath)
@@ -172,6 +172,171 @@ describe('Deleting slots', () => {
   });
 });
 
+describe('Searching for users', () => {
+  it('/should return 200 for successful search', (done) => {
+    let user_input = {
+      "friendname": "Amila",
+      "friendsurname": "Mujkic"
+    }
+    chai.request(app).post('/search').send(user_input).then(res => {
+      expect(res).to.have.status(200);
+      done();
+    }).catch(err => {
+      console.log(err);
+    });
+  })
+
+  it('/should return 400 for error', (done) => {
+    let user_invalid_input = {
+      "friendname": "",
+    }
+    chai.request(app).post('/search').send(user_invalid_input).then(res => {
+      expect(res).to.have.status(400);
+      done();
+    }).catch(err => {
+      console.log(err);
+    });
+  })
+})
+
+
+describe('Deleting friend', () => {
+  it('/should return 200 for successful deletion', (done) => {
+    let user_input = {
+      "FUFirstName": "Amila",
+      "FUSurname": "Mujkic",
+      "SUFirstName": "Dino",
+      "SUSurname": "Osmankovic"
+    }
+    chai.request(app).post('/user/delete').send(user_input).then(res => {
+      expect(res).to.have.status(200);
+      expect(res.body.msg).to.be.equal("User deleted from friends!");
+      done();
+    }).catch(err => {
+      console.log(err);
+    });
+  })
+
+  it('/should return 400 for error', (done) => {
+    let user_invalid_input = {
+      "friendname": "",
+    }
+    chai.request(app).post('/user/delete').send(user_invalid_input).then(res => {
+      expect(res).to.have.status(400);
+      done();
+    }).catch(err => {
+      console.log(err);
+    });
+  })
+})
+
+
+describe('Friend request', () => {
+  it('/should return 200 for successfully sent friend request', (done) => {
+    let user_input = {
+      "FirstName":"Dino",
+      "Surname":"Osmankovic"
+    }
+    chai.request(app).post('/user/add').send(user_input).then(res => {
+      expect(res).to.have.status(200);
+      expect(res.body.msg).to.be.equal("User added");
+      done();
+    }).catch(err => {
+      console.log(err);
+    });
+  })
+
+  it('/should return 400 for error', (done) => {
+    let user_invalid_input = {
+      "friendname": ""
+    }
+    chai.request(app).post('/user/add').send(user_invalid_input).then(res => {
+      expect(res).to.have.status(400);
+      done();
+    }).catch(err => {
+      console.log(err);
+    });
+  })
+})
+
+
+describe('Accepting/declining friend requests', () => {
+  it('/should return 200 for successful action', (done) => {
+    let user_input = {
+      "FUFirstName": "Amila",
+      "FUSurname": "Mujkic",
+      "SUFirstName": "Dino",
+      "SUSurname": "Osmankovic",
+      "action": "accept"
+    }
+    chai.request(app).post('/user/request').send(user_input).then(res => {
+      expect(res).to.have.status(200);
+      expect(res.body.msg).to.be.equal("Action done!");
+      done();
+    }).catch(err => {
+      console.log(err);
+    });
+  })
+
+  it('/should return 200 for successful action', (done) => {
+    let user_input = {
+      "FUFirstName": "Amila",
+      "FUSurname": "Mujkic",
+      "SUFirstName": "Dino",
+      "SUSurname": "Osmankovic",
+      "action": "decline"
+    }
+    chai.request(app).post('/user/request').send(user_input).then(res => {
+      expect(res).to.have.status(200);
+      expect(res.body.msg).to.be.equal("Action done!");
+      done();
+    }).catch(err => {
+      console.log(err);
+    });
+  })
+
+  it('/should return 400 for error', (done) => {
+    let user_invalid_input = {
+      "friendname": ""
+    }
+    chai.request(app).post('/user/request').send(user_invalid_input).then(res => {
+      expect(res).to.have.status(400);
+      done();
+    }).catch(err => {
+      console.log(err);
+    });
+  })
+})
+
+
+describe('Mutual meetings', () => {
+  it('/should return 200 for successfully fetching mutual meetings', (done) => {
+    let user_input = {
+      "FUFirstName": "Amila",
+      "FUSurname": "Mujkic",
+      "SUFirstName": "Dino",
+      "SUSurname": "Osmankovic"
+    }
+    chai.request(app).post('/friends/slots').send(user_input).then(res => {
+      expect(res).to.have.status(200);
+      done();
+    }).catch(err => {
+      console.log(err);
+    });
+  })
+
+  it('/should return 400 for error', (done) => {
+    let user_invalid_input = {
+      "friendname": ""
+    }
+    chai.request(app).post('/friends/slots').send(user_invalid_input).then(res => {
+      expect(res).to.have.status(400);
+      done();
+    }).catch(err => {
+      console.log(err);
+    });
+  })
+})
 
 
 

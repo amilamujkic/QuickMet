@@ -331,7 +331,7 @@ router.post('/user/request', userMiddleware.isLoggedIn, function(req, res) {
   var action = req.body.action; 
 
   if(action === "accept") {
-  db.query(`UPDATE Friendship SET isFriend = true  and isRequested = false WHERE Friendship.FirstUserID = User.UserID and User.FirstName = ${db.escape(
+  db.query(`UPDATE Friendship SET isFriend = true and isRequested = false WHERE Friendship.FirstUserID = User.UserID and User.FirstName = ${db.escape(
     req.body.FUFirstName
   )}) and User.Surname = ${db.escape(
     req.body.FUSurname
@@ -342,7 +342,7 @@ router.post('/user/request', userMiddleware.isLoggedIn, function(req, res) {
   )}))`);
   }
   else {
-    if(action === "accept") {
+    if(action === "decline") {
       db.query(`UPDATE Friendship SET isFriend = false  and isRequested = false WHERE Friendship.FirstUserID = User.UserID and User.FirstName = ${db.escape(
         req.body.FUFirstName
       )}) and User.Surname = ${db.escape(
