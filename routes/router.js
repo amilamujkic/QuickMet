@@ -326,7 +326,7 @@ router.post('/user/delete', userMiddleware.isLoggedIn, function(req, res) {
   
 // accept/decline friend request
 
-router.post('/user/request', userMiddleware.isLoggedIn, function(req, res) {
+router.post('/user/request/action', userMiddleware.isLoggedIn, function(req, res) {
 
   var action = req.body.action; 
 
@@ -388,5 +388,20 @@ router.post('/friends/slots', userMiddleware.isLoggedIn, function(req, res) {
     else { 
       return res.status(200).send(slotslist); };
     });
+
+
+// listing friend requests
+
+router.post('/user/request', userMiddleware.isLoggedIn, function(req, res) {
+
+  var user = 1;
+  var requests = db.query(`SELECT User.FirstName, User.Surname FROM User
+  WHERE Friendship.FirstUserID = ? and Friendship.SecondUserID = User.UserID and isRequested = true`, [user]);
+
+  if(err) {
+    return res.status(400);
+  }
+  else { return res.status(200).send(requests); }
+  });
 
 module.exports = router;
