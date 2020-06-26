@@ -392,7 +392,7 @@ router.post('/friends/slots', userMiddleware.isLoggedIn, function(req, res) {
 
 // listing friend requests
 
-router.post('/user/request', userMiddleware.isLoggedIn, function(req, res) {
+router.get('/user/request', userMiddleware.isLoggedIn, function(req, res) {
 
   var user = 1;
   var requests = db.query(`SELECT User.FirstName, User.Surname FROM User

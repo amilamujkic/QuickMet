@@ -338,6 +338,16 @@ describe('Mutual meetings', () => {
   })
 })
 
+describe('getting friend requests of the user', ()=>{
+  it('should return all friend requests of the user', (done) =>{
+      chai.request(app)
+      .get('/user/request')
+      .end(function(err, res){
+          expect(res).to.have.status(200);
+          done();
+      });	
+  });
+});	
 
 
 
