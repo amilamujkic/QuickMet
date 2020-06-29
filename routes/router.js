@@ -404,4 +404,23 @@ router.get('/user/request', userMiddleware.isLoggedIn, function(req, res) {
   else { return res.status(200).send(requests); }
   });
 
+// main page
+
+router.get('/mainpage', async (req, res) => {
+
+  var user = 1;
+  var conn = await connection(db).catch(e => {});
+  var slots = await query(conn,`SELECT Slot.StartDate, Slot.Duration, Categories.CategoryName, Slot.Destination,  Slot.isBooked, Slot.Notes
+     FROM Slot, Categories
+     WHERE Categories.CategoryID = Slot.MeetingTypeID 
+      and (Slot.FirstUserID = Friendship.SecoundUserID) 
+      and (Slot.StartDate + Slot.Duration > CURRENT_TIMESTAMP)
+      and (Friendship.FirstUserID = ?)
+      and Friendship.isFriend = true)
+     ORDERBY Slot.StartDate`, [user])
+  return res.status(200).send(slots);
+
+});
+
+
 module.exports = router;
