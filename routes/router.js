@@ -416,11 +416,25 @@ router.get('/mainpage', async (req, res) => {
       and (Slot.FirstUserID = Friendship.SecoundUserID) 
       and (Slot.StartDate + Slot.Duration > CURRENT_TIMESTAMP)
       and (Friendship.FirstUserID = ?)
-      and Friendship.isFriend = true)
+      and (Friendship.isFriend = true)
+      and (Slot.isBooked = false)
      ORDERBY Slot.StartDate`, [user])
   return res.status(200).send(slots);
 
 });
 
+// booking a meeting
+
+router.get('/mainpage/book', async (req, res) => {
+
+  var user = 1;
+  var conn = await connection(db).catch(e => {});
+  var slots = await query(conn,`UPDATE Slot SET isBooked = true and SecondUserID = ?
+     WHERE SlotID = (${db.escape(
+      req.body.SlotID
+    )})`, [user])
+  return res.status(200).send(slots);
+
+});
 
 module.exports = router;
