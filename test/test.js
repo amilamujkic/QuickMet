@@ -349,6 +349,114 @@ describe('getting friend requests of the user', ()=>{
   });
 });	
 
+describe('getting meeting summaries', ()=>{
+  var slotid = 3;
+  it('should return all meeting summaries of the user', (done) =>{
+      chai.request(app)
+      .get('/friend/summaries')
+      .send(slotid)
+      .end(function(err, res){
+          expect(res).to.have.status(200);
+          done();
+      });	
+  });
+});	
+
+describe('Adding meeting note', () => {
+  it('/should return 200 for successfully added note', (done) => {
+    let user_input = {
+      "Notes": "Let's meet in front of the office",
+      "SlotID": "3" }
+
+    chai.request(app).post('/friends/summaries/add').send(user_input).then(res => {
+      expect(res).to.have.status(200);
+      done();
+    }).catch(err => {
+      console.log(err);
+    });
+  })
+
+  it('/should return 400 for error', (done) => {
+    let user_invalid_input = {
+      "friendname": ""
+    }
+    chai.request(app).post('/friends/summaries/add').send(user_invalid_input).then(res => {
+      expect(res).to.have.status(400);
+      done();
+    }).catch(err => {
+      console.log(err);
+    });
+  })
+})
 
 
+describe('main tab query', ()=>{
+  it('should return all free slots of friends', (done) =>{
+      chai.request(app)
+      .get('/mainpage')
+      .end(function(err, res){
+          expect(res).to.have.status(200);
+          done();
+      });	
+  });
+});
 
+
+describe('booking slot', ()=>{
+  var slotid = 2;
+  it('should return successful booked slot', (done) =>{
+      chai.request(app)
+      .post('/mainpage/book')
+      .send(slotid)
+      .end(function(err, res){
+          expect(res).to.have.status(200);
+          done();
+      });	
+  });
+});	
+
+describe('urgently delete', ()=>{
+  var slotid = 2;
+  it('should return successful deleted slot', (done) =>{
+      chai.request(app)
+      .post('/urgent/delete')
+      .send(slotid)
+      .end(function(err, res){
+          expect(res).to.have.status(200);
+          done();
+      });	
+  });
+});	
+
+
+describe('Adding meeting urgently', () => {
+  it('/should return 200 for successfully adding meeting', (done) => {
+    let user_input = {
+      "StartDate": "07/06/2020 03:04PM",
+      "Duration": "3:00",
+      "Destination": "Coffee shop",
+      "Notes":"I need to talk about the issue that we had",
+      "CategoryName":"Coffe",
+      "FirstUserID":"1",
+      "SecondUserID":"2" }
+
+    chai.request(app).post('/urgent/add').send(user_input).then(res => {
+      expect(res).to.have.status(200);
+      done();
+    }).catch(err => {
+      console.log(err);
+    });
+  })
+
+  it('/should return 500 for error', (done) => {
+    let user_invalid_input = {
+      "friendname": ""
+    }
+    chai.request(app).post('/urgent/add').send(user_invalid_input).then(res => {
+      expect(res).to.have.status(500);
+      done();
+    }).catch(err => {
+      console.log(err);
+    });
+  })
+})

@@ -36,6 +36,7 @@
     "pg": "^8.2.1",
     "sequelize": "^5.21.13",
     "sequelize-cli": "^5.5.1",
+    "socket.io": "^2.3.0",
     "superset": "^1.0.1",
     "then-busboy": "^5.0.0-beta.2",
     "uuid": "^8.1.0"

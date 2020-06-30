@@ -1,9 +1,6 @@
 const express = require('express');
 const app = express();
-var pg = require('pg');
-const http = require('http');
 const path = require('path');
-const busboy = require('then-busboy');
 const fileUpload = require('express-fileupload');
 const bodyParser = require('body-parser');
 const cors = require('cors');
@@ -18,6 +15,9 @@ app.use(fileUpload());
 
 const router = require('./routes/router.js');
 app.use(router);
+
+const notifications = requires ('./routes/notifications.js');
+app.use(notifications);
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 

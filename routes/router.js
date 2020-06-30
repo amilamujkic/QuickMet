@@ -409,7 +409,7 @@ router.get('/user/request', userMiddleware.isLoggedIn, function(req, res) {
 router.get('/mainpage', async (req, res) => {
 
   var user = 1;
-  var conn = await connection(db).catch(e => {});
+  var conn = await db.catch(e => {});
   var slots = await query(conn,`SELECT Slot.StartDate, Slot.Duration, Categories.CategoryName, Slot.Destination,  Slot.isBooked, Slot.Notes
      FROM Slot, Categories
      WHERE Categories.CategoryID = Slot.MeetingTypeID 
@@ -425,10 +425,10 @@ router.get('/mainpage', async (req, res) => {
 
 // booking a meeting
 
-router.get('/mainpage/book', async (req, res) => {
+router.post('/mainpage/book', async (req, res) => {
 
   var user = 1;
-  var conn = await connection(db).catch(e => {});
+  var conn = await db.catch(e => {});
   var slots = await query(conn,`UPDATE Slot SET isBooked = true and SecondUserID = ?
      WHERE SlotID = (${db.escape(
       req.body.SlotID
@@ -436,5 +436,77 @@ router.get('/mainpage/book', async (req, res) => {
   return res.status(200).send(slots);
 
 });
+
+// show meeting summaries/notes with certain friend
+
+router.get('/friend/summaries', async (req, res) => {
+
+  var user = 1;
+  var conn = await connection(db).catch(e => {});
+  var notes = await query(conn,`SELECT Slot.Notes
+     WHERE Slot.SecondUserID = (${db.escape(
+      req.body.SlotID
+    )}) and Slot.FirstUSerID = ? 
+    ORDER BY Slot.StartDate` , [user])
+  return res.status(200).send(notes);
+
+});
+
+// adding meeting note
+
+router.post('/friends/summaries/add', userMiddleware.isLoggedIn, function(req, res) {
+  
+  var summary = db.query(`UPDATE Slot SET Notes = ${db.escape(
+    req.body.notes
+  )} WHERE SlotID = ${db.escape(
+    req.body.slotID
+  )}`);
+
+  if(err) {
+    return res.status(400);
+  }
+  else { 
+    return res.status(200).send(summary); };
+  });
+
+// urgent tab
+
+router.post('/urgent/delete', function(req, res) {
+
+  let deletion = `DELETE * FROM Slot WHERE SlotID = (${db.escape(req.body.SlotID)})`;
+
+  db.query(deletion, (err, results) => {
+  if (err) {
+   return res.status(500).send('Could not delete it. Error!');
+  }
+    return res.status(200);
+  });
+
+});
+
+router.post('/urgent/add', function(req, res) {
+
+  let stmt = `INSERT INTO Slot (StartDate, Duration, Destination, Notes)  VALUES ((${db.escape(
+    req.body.StartDate, req.body.Duration, req.body.Destination, req.body.Notes)}))`;
+
+  let stmu = `INSERT INTO Slot (MeetingTypeID) SELECT CategoryID FROM Categories WHERE LOWER(Categories.CategoryName) = LOWER((${db.escape(
+    req.body.CategoryName
+  )}))`;
+
+  let stmv = `INSERT INTO Slot (FirstUserID,SecondUserID, isBooked) VALUES ((${db.escape(
+    req.body.FirstUserID, req.body.SecondUserID, true)}))`;
+
+
+  db.query(stmt, stmu, stmv,(err, results) => {
+  if (err) {
+   return res.status(500).send('Something is missing. Check it out.');
+  }
+    return res.status(200);
+  });
+
+});
+
+
+
 
 module.exports = router;
